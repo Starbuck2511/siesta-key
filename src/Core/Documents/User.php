@@ -10,6 +10,7 @@ use FOS\UserBundle\Model\User as BaseUser;
 /**
  * @MongoDB\Document(collection="users", repositoryClass="Core\Repository\MongoDb\UserRepository")
  * @MongoDBUnique(fields="email")
+ * @MongoDBUnique(fields="apiKey")
  */
 class User extends BaseUser
 {
@@ -18,9 +19,16 @@ class User extends BaseUser
      */
     protected $id;
 
+    /**
+     * @MongoDB\Field(type="string")
+     * @Assert\NotBlank()
+     */
+    protected $apiKey;
+
     public function __construct()
     {
         parent::__construct();
+        $this->apiKey = md5(uniqid(rand(), true));
     }
 
 }

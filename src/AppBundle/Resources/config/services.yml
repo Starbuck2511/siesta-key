@@ -1,4 +1,13 @@
 services:
+
     app.user:
         class: Core\App\User
-        arguments: [@snc_redis.default]
+        arguments: [@doctrine.odm.mongodb.document_manager, @snc_redis.default]
+
+    app.group:
+        class: Core\App\Group
+        arguments: [@doctrine.odm.mongodb.document_manager, @snc_redis.default]
+
+    app.token_authenticator:
+            class: AppBundle\Security\TokenAuthenticator
+            arguments: [@doctrine.odm.mongodb.document_manager]

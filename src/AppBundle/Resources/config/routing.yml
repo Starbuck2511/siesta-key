@@ -14,3 +14,13 @@ list_user:
     methods: [GET]
     requirements:
             id:  \d+
+
+list_groups:
+    path:      /groups
+    defaults:  { _controller: AppBundle:Group:listGroups }
+    methods: [GET]
+
+create_group:
+    path:      /groups
+    defaults:  { _controller: AppBundle:Group:createGroup }
+    methods: [POST]
