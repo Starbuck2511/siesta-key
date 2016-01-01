@@ -1,0 +1,4 @@
+services:
+    app.user:
+        class: Core\App\User
+        arguments: [@snc_redis.default]

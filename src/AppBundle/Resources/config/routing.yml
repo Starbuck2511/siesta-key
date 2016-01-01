@@ -1,0 +1,16 @@
+list_users:
+    path:      /users
+    defaults:  { _controller: AppBundle:User:listUsers }
+    methods: [GET]
+
+create_user:
+    path:      /users
+    defaults:  { _controller: AppBundle:User:createUser }
+    methods: [POST]
+
+list_user:
+    path:      /users/{id}
+    defaults:  { _controller: AppBundle:User:listUser }
+    methods: [GET]
+    requirements:
+            id:  \d+
