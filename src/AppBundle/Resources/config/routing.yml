@@ -17,10 +17,10 @@ list_user:
 
 list_groups:
     path:      /groups
-    defaults:  { _controller: AppBundle:Group:listGroups }
+    defaults:  { _controller: app.group_controller:listGroupsAction }
     methods: [GET]
 
 create_group:
     path:      /groups
-    defaults:  { _controller: AppBundle:Group:createGroup }
+    defaults:  { _controller: app.group_controller:createGroupAction }
     methods: [POST]

@@ -30,5 +30,4 @@ class User extends BaseUser
         parent::__construct();
         $this->apiKey = md5(uniqid(rand(), true));
     }
-
 }

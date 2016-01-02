@@ -2,9 +2,11 @@
 
 namespace Core\Documents;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use Symfony\Component\Validator\Constraints as Assert;
-use FOS\UserBundle\Model\User as BaseUser;
+use Symfony\Component\Serializer\Annotation\Groups;
+
 
 /**
  * @MongoDB\Document(collection="groups", repositoryClass="Core\Repository\MongoDb\GroupRepository")
@@ -13,20 +15,29 @@ class Group
 {
     /**
      * @MongoDB\Id(strategy="auto")
+     * @Groups({"group1"})
      */
     protected $id;
 
     /**
      * @MongoDB\Field(type="string")
      * @Assert\NotBlank()
+     * @Groups({"group1"})
      */
     protected $name;
 
     /**
      * @MongoDB\Field(type="string")
      * @Assert\NotBlank()
+     * @Groups({"group1"})
      */
     protected $description;
+
+    /**
+     * @MongoDB\Field(type="collection")
+     * @Groups({"group1"})
+     */
+    protected $users = [];
 
 
     public function __construct()
@@ -82,6 +93,19 @@ class Group
         $this->description = $description;
     }
 
+    /**
+     * @return mixed
+     */
+    public function getUsers()
+    {
+        return $this->users;
+    }
 
-
+    /**
+     * @param $user
+     */
+    public function addUser($user)
+    {
+        $this->users[] = $user;
+    }
 }

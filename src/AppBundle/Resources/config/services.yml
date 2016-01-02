@@ -6,8 +6,24 @@ services:
 
     app.group:
         class: Core\App\Group
-        arguments: [@doctrine.odm.mongodb.document_manager, @snc_redis.default]
+        arguments: [@doctrine.odm.mongodb.document_manager, @request_stack, @security.token_storage, @app.data_handler]
 
     app.token_authenticator:
-            class: AppBundle\Security\TokenAuthenticator
-            arguments: [@doctrine.odm.mongodb.document_manager]
+        class: AppBundle\Security\TokenAuthenticator
+        arguments: [@doctrine.odm.mongodb.document_manager]
+
+    app.cache:
+        class: Core\Cache\CacheProvider
+        arguments: [@app.cache_predis]
+
+    app.cache_predis:
+        class: Core\Cache\Predis\PredisAdapter
+        arguments: [@snc_redis.default]
+
+    app.data_handler:
+        class: Core\Data\DataHandler
+        arguments: [@serializer]
+
+    app.group_controller:
+        class: AppBundle\Controller\GroupController
+        arguments: [@app.cache, @app.group]
