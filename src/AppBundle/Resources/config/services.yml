@@ -26,4 +26,9 @@ services:
 
     app.group_controller:
         class: AppBundle\Controller\GroupController
-        arguments: [@app.cache, @app.group]
+        arguments: [@app.cache, @app.group, @app.cache_controller]
+
+    app.cache_controller:
+        class: AppBundle\Controller\CacheController
+        calls:
+            - [setContainer, [@service_container]]

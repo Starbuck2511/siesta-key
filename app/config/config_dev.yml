@@ -14,10 +14,12 @@ web_profiler:
 monolog:
     handlers:
         main:
-            type: stream
+            #type: stream
+            type:  rotating_file
             path: "%kernel.logs_dir%/%kernel.environment%.log"
             level: debug
             channels: [!event]
+            max_files: 10
         console:
             type:   console
             bubble: false
@@ -33,3 +35,9 @@ monolog:
 
 #swiftmailer:
 #    delivery_address: me@example.com
+
+# Some settings for the app itself
+app:
+    cache:
+        # cache results from db in extra cache layer
+        result_cache: true

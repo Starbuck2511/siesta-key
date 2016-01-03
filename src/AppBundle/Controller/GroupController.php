@@ -10,32 +10,40 @@ use Symfony\Component\HttpFoundation\Response;
 class GroupController
 {
 
+    use \Symfony\Component\DependencyInjection\ContainerAwareTrait;
+
     private $cache;
+
+    private $cacheEnabled;
 
     private $group;
 
-    public function __construct(CacheProvider $cacheProvider, Group $group)
+    public function __construct(CacheProvider $cacheProvider, Group $group, CacheController $cacheController)
     {
         /**
          * @var \Core\Cache\CacheInterface
          */
         $this->cache = $cacheProvider->getCache();
-
         $this->group = $group;
+        $this->cacheEnabled = $cacheController->isCacheEnabled();
     }
 
 
     public function listGroupsAction()
     {
-        $data = $this->cache->getItem('groups:all');
+        $data = null;
 
-        if(!$data){
-            $data = $this->group->listGroups();
-            $this->cache->setItem('groups:all', $data);
-        } else {
-            echo 'cache hit ';
+        if ($this->cacheEnabled) {
+            $data = $this->cache->getItem('groups:all');
         }
 
+        if (!$data) {
+            $data = $this->group->listGroups();
+
+            if ($this->cacheEnabled) {
+                $this->cache->setItem('groups:all', $data);
+            }
+        }
         $this->sendJsonResponse($data);
     }
 
