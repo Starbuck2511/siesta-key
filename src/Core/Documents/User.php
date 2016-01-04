@@ -6,28 +6,83 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use Doctrine\Bundle\MongoDBBundle\Validator\Constraints\Unique as MongoDBUnique;
 use Symfony\Component\Validator\Constraints as Assert;
 use FOS\UserBundle\Model\User as BaseUser;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * @MongoDB\Document(collection="users", repositoryClass="Core\Repository\MongoDb\UserRepository")
- * @MongoDBUnique(fields="email")
  * @MongoDBUnique(fields="apiKey")
  */
 class User extends BaseUser
 {
     /**
      * @MongoDB\Id(strategy="auto")
+     * @Groups({"group1"})
      */
     protected $id;
 
     /**
      * @MongoDB\Field(type="string")
      * @Assert\NotBlank()
+     * @todo Check if not already exists in db
      */
     protected $apiKey;
+
+    /**
+     * @Groups({"group1"})
+     */
+    protected $username;
+
+    /**
+     * @Groups({"group1"})
+     */
+    protected $email;
+
+    /**
+     * groups of the app where the user is admin
+     *
+     * @MongoDB\Field(type="collection")
+     * @Groups({"group1"})
+     */
+    protected $adminGroups = [];
+
 
     public function __construct()
     {
         parent::__construct();
         $this->apiKey = md5(uniqid(rand(), true));
     }
+
+    /**
+     * @return mixed
+     */
+    public function getApiKey()
+    {
+        return $this->apiKey;
+    }
+
+    /**
+     * @param mixed $apiKey
+     */
+    public function setApiKey($apiKey)
+    {
+        $this->apiKey = $apiKey;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getAdminGroups()
+    {
+        return $this->adminGroups;
+    }
+
+    /**
+     * @param $group
+     */
+    public function addAdminGroup($group)
+    {
+        $this->adminGroups[] = $group;
+    }
+
+
 }

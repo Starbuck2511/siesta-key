@@ -7,9 +7,12 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Serializer\Annotation\Groups;
 
-
 /**
  * @MongoDB\Document(collection="groups", repositoryClass="Core\Repository\MongoDb\GroupRepository")
+ * @MongoDB\HasLifecycleCallbacks
+ * @MongoDB\Indexes({
+ *   @MongoDB\Index(keys={"name"="asc"})
+ * })
  */
 class Group
 {
@@ -21,6 +24,7 @@ class Group
 
     /**
      * @MongoDB\Field(type="string")
+     * @MongoDB\Index(unique=true, order="asc")
      * @Assert\NotBlank()
      * @Groups({"group1"})
      */
@@ -28,21 +32,21 @@ class Group
 
     /**
      * @MongoDB\Field(type="string")
-     * @Assert\NotBlank()
      * @Groups({"group1"})
      */
     protected $description;
 
+
     /**
-     * @MongoDB\Field(type="collection")
+     * @MongoDB\ReferenceMany(targetDocument="User")
      * @Groups({"group1"})
      */
-    protected $users = [];
+    protected $users;
 
 
     public function __construct()
     {
-
+        $this->users = new ArrayCollection();
     }
 
     /**
@@ -94,7 +98,7 @@ class Group
     }
 
     /**
-     * @return mixed
+     * @return array
      */
     public function getUsers()
     {
@@ -106,6 +110,18 @@ class Group
      */
     public function addUser($user)
     {
+
         $this->users[] = $user;
+
     }
+
+    /**
+     * @MongoDB\PrePersist
+     * @MongoDB\PreUpdate
+     */
+    public function validate()
+    {
+
+    }
+
 }

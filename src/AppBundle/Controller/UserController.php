@@ -2,33 +2,66 @@
 
 namespace AppBundle\Controller;
 
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Symfony\Component\HttpFoundation\Request;
+use Core\Cache\CacheProvider;
+use Core\App\User;
+use Symfony\Component\HttpFoundation\Response;
 
-class UserController extends Controller
+
+class UserController
 {
+    private $cache;
+
+    private $cacheEnabled;
+
+    private $user;
+
+    public function __construct(CacheProvider $cacheProvider, User $user, CacheController $cacheController)
+    {
+        /**
+         * @var \Core\Cache\CacheInterface
+         */
+        $this->cache = $cacheProvider->getCache();
+        $this->user = $user;
+        $this->cacheEnabled = $cacheController->isCacheEnabled();
+    }
+
+    public function listUserAction()
+    {
+        exit('listUserAction');
+    }
+
 
     public function listUsersAction()
     {
 
-        $this->container->get('app.user')->listUsers();
-        exit;
+        $data = null;
+
+        if ($this->cacheEnabled) {
+            $data = $this->cache->getItem('users:all');
+        }
+
+        if (!$data) {
+            $data = $this->user->listUsers();
+
+            if ($this->cacheEnabled) {
+                $this->cache->setItem('groups:all', $data);
+            }
+        }
+        $this->sendJsonResponse($data);
     }
 
     public function createUserAction()
     {
+        // user is created by FOSUserBundle
 
-        $this->container->get('app.user')->createUser();
-        exit;
     }
 
-    public function listUserAction($id)
+    private function sendJsonResponse($data)
     {
-
-
-        $this->container->get('app.user')->listUser($id);
-        exit;
+        $response = new Response();
+        $response->setContent($data);
+        $response->headers->set('Content-Type', 'application/json');
+        $response->send();
     }
 
 

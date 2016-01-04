@@ -2,11 +2,11 @@ services:
 
     app.user:
         class: Core\App\User
-        arguments: [@doctrine.odm.mongodb.document_manager, @snc_redis.default]
+        arguments: [@doctrine.odm.mongodb.document_manager, @request_stack, @security.token_storage, @app.data_handler]
 
     app.group:
         class: Core\App\Group
-        arguments: [@doctrine.odm.mongodb.document_manager, @request_stack, @security.token_storage, @app.data_handler]
+        arguments: [@doctrine.odm.mongodb.document_manager, @request_stack, @security.token_storage, @app.data_handler, @validator]
 
     app.token_authenticator:
         class: AppBundle\Security\TokenAuthenticator
@@ -24,11 +24,15 @@ services:
         class: Core\Data\DataHandler
         arguments: [@serializer]
 
-    app.group_controller:
-        class: AppBundle\Controller\GroupController
-        arguments: [@app.cache, @app.group, @app.cache_controller]
-
     app.cache_controller:
         class: AppBundle\Controller\CacheController
         calls:
             - [setContainer, [@service_container]]
+
+    app.group_controller:
+        class: AppBundle\Controller\GroupController
+        arguments: [@app.cache, @app.group, @app.cache_controller]
+
+    app.user_controller:
+        class: AppBundle\Controller\UserController
+        arguments: [@app.cache, @app.user, @app.cache_controller]

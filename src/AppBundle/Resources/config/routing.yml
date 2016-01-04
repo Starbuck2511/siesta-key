@@ -1,19 +1,21 @@
+home:
+    path:      /
+    defaults:  { _controller: AppBundle:Default:index }
+    methods: [GET]
 list_users:
     path:      /users
-    defaults:  { _controller: AppBundle:User:listUsers }
+    defaults:  { _controller: app.user_controller:listUsersAction }
     methods: [GET]
 
 create_user:
     path:      /users
-    defaults:  { _controller: AppBundle:User:createUser }
+    defaults:  { _controller: app.user_controller:createUserAction }
     methods: [POST]
 
 list_user:
     path:      /users/{id}
-    defaults:  { _controller: AppBundle:User:listUser }
+    defaults:  { _controller: app.user_controller:listUserAction }
     methods: [GET]
-    requirements:
-            id:  \d+
 
 list_groups:
     path:      /groups
@@ -24,3 +26,19 @@ create_group:
     path:      /groups
     defaults:  { _controller: app.group_controller:createGroupAction }
     methods: [POST]
+
+list_group:
+    path:      /groups/{id}
+    defaults:  { _controller: app.group_controller:listGroupAction }
+    methods: [GET]
+
+create_group_user:
+    path:      /groups/{id}/users
+    defaults:  { _controller: app.group_controller:createGroupUserAction }
+    methods: [POST]
+
+delete_group_user:
+    path:      /groups/{id}/users
+    defaults:  { _controller: app.group_controller:deleteGroupUserAction }
+    methods: [DELETE]
+

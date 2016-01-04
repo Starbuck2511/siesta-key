@@ -1,35 +1,54 @@
 <?php
 namespace Core\App;
 
+use Core\Data\DataHandler;
 use Doctrine\ODM\MongoDB\DocumentManager;
-use \Predis\Client as Predis;
+use Core\Data\DataHandler as ResponseData;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
 
 class User
 {
-    protected $redis;
+    protected $data;
 
     protected $dm;
 
+    protected $requestStack;
+
+    protected $tokenStorage;
+
     /**
      * @param DocumentManager $dm
-     * @param Predis $predis
+     * @param RequestStack $requestStack
+     * @param TokenStorage $tokenStorage
+     * @param DataHandler $data
+     *
      */
-    public function __construct(DocumentManager $dm, Predis $predis) {
-        $this->dm = $predis;
-        $this->redis = $predis;
+    public function __construct(DocumentManager $dm,  RequestStack $requestStack, TokenStorage $tokenStorage, ResponseData $data) {
+        $this->dm = $dm;
+        $this->data = $data;
+        $this->requestStack = $requestStack;
+        $this->tokenStorage = $tokenStorage;
     }
 
     public function listUsers()
     {
-        echo 'list users ...';
+        $users = $this->dm->getRepository('Documents:User')->findAll();
+
+        if (!$users) {
+            throw new NotFoundHttpException('No users found');
+        }
+
+        $data = $this->data->prepare($users, array('groups' => array('group1')));
+
+        return $data;
 
     }
 
     public function createUser()
     {
-
-        echo 'create user ...';
-
+        // user is created by FOSUserBundle
     }
 
     public function listUser($id)

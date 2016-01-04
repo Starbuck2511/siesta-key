@@ -9,9 +9,6 @@ use Symfony\Component\HttpFoundation\Response;
 
 class GroupController
 {
-
-    use \Symfony\Component\DependencyInjection\ContainerAwareTrait;
-
     private $cache;
 
     private $cacheEnabled;
@@ -47,10 +44,54 @@ class GroupController
         $this->sendJsonResponse($data);
     }
 
+    public function listGroupAction($id)
+    {
+        $data = null;
+
+        if ($this->cacheEnabled) {
+            $data = $this->cache->getItem('group:' . $id);
+        }
+
+        if (!$data) {
+            $data = $this->group->listGroup($id);
+
+            if ($this->cacheEnabled) {
+                $this->cache->setItem('group:' . $id, $data);
+            }
+        }
+        $this->sendJsonResponse($data);
+    }
+
     public function createGroupAction()
     {
         $data = $this->group->createGroup();
-        $this->cache->deleteItem('groups:all');
+
+        if ($this->cacheEnabled) {
+            $this->cache->deleteItem('groups:all');
+        }
+
+        $this->sendJsonResponse($data);
+    }
+
+    public function createGroupUserAction($id)
+    {
+        $data = $this->group->createGroupUser($id);
+
+        if ($this->cacheEnabled) {
+            $this->cache->deleteItem('group:'. $id);
+        }
+
+        $this->sendJsonResponse($data);
+    }
+
+    public function deleteGroupUserAction($id)
+    {
+        $data = $this->group->deleteGroupUser($id);
+
+        if ($this->cacheEnabled) {
+            $this->cache->deleteItem('group:'. $id);
+        }
+
         $this->sendJsonResponse($data);
     }
 
@@ -61,6 +102,5 @@ class GroupController
         $response->headers->set('Content-Type', 'application/json');
         $response->send();
     }
-
 
 }

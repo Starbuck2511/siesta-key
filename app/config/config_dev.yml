@@ -40,4 +40,4 @@ monolog:
 app:
     cache:
         # cache results from db in extra cache layer
-        result_cache: true
+        result_cache: false
