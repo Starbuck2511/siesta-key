@@ -5,6 +5,7 @@ use Core\Data\DataHandler;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Core\Documents\Group as GroupDocument;
 use Core\Data\DataHandler as ResponseData;
+use Core\Error\ErrorHandler;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
@@ -23,7 +24,7 @@ class Group
 
     protected $validator;
 
-    protected $errors;
+    protected $errorHandler;
 
     /**
      * @param DocumentManager $dm
@@ -37,13 +38,15 @@ class Group
         RequestStack $requestStack,
         TokenStorage $tokenStorage,
         ResponseData $data,
-        ValidatorInterface $validator
+        ValidatorInterface $validator,
+        ErrorHandler $errorHandler
     ) {
         $this->dm = $dm;
         $this->data = $data;
         $this->requestStack = $requestStack;
         $this->tokenStorage = $tokenStorage;
         $this->validator = $validator;
+        $this->errorHandler = $errorHandler;
     }
 
     /**
@@ -78,6 +81,8 @@ class Group
     public function createGroup()
     {
         $data = null;
+        $errors = [];
+
         $request = $this->requestStack->getCurrentRequest();
         /**
          * @var \Core\Documents\User
@@ -95,20 +100,23 @@ class Group
         $user->addAdminGroup($group->getId());
         $this->dm->persist($user);
 
-        $errors = $this->validator->validate($group);
+        $violations = $this->validator->validate($group);
 
         if ((!$this->dm->getRepository('Documents:Group')->isUnique('name', $name))) {
-            $this->errors[] = 'Not a unique value for field name';
+            $errors['message'] = 'Not a unique value for field name';
+            $errors['field'] = 'name';
+            $errors['code'] = 701;
         }
 
-        if (count($errors) > 0 || !empty($this->errors)) {
-            dump($errors);
-            dump($this->errors);
-            exit('debug exit ...');
+        if (count($violations) > 0) {
+            $data = $this->errorHandler->handle($violations);
+        } elseif (!empty($errors)) {
+            $data = $this->errorHandler->handle($errors);
         } else {
             $this->dm->flush();
             $data = $this->data->prepare($group, array('groups' => array('group1')));
         }
+
         return $data;
     }
 

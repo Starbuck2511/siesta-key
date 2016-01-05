@@ -1,12 +1,19 @@
 services:
 
+    app.error_handler:
+        class: Core\Error\ErrorHandler
+        arguments: [@app.error_processor]
+
+    app.error_processor:
+        class: Core\Error\ApiErrorProcessor
+
     app.user:
         class: Core\App\User
         arguments: [@doctrine.odm.mongodb.document_manager, @request_stack, @security.token_storage, @app.data_handler]
 
     app.group:
         class: Core\App\Group
-        arguments: [@doctrine.odm.mongodb.document_manager, @request_stack, @security.token_storage, @app.data_handler, @validator]
+        arguments: [@doctrine.odm.mongodb.document_manager, @request_stack, @security.token_storage, @app.data_handler, @validator, @app.error_handler]
 
     app.token_authenticator:
         class: AppBundle\Security\TokenAuthenticator
