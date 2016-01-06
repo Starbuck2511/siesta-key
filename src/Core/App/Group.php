@@ -9,8 +9,10 @@ use Core\Error\ErrorHandler;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
+use Symfony\Component\Security\Core\Exception\TokenNotFoundException;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\Validator\ConstraintViolationInterface;
+use Symfony\Component\Validator\Exception;
 
 class Group
 {
@@ -32,6 +34,7 @@ class Group
      * @param TokenStorage $tokenStorage
      * @param DataHandler $data
      * @param ValidatorInterface $validator
+     * @param ErrorHandler $errorHandler
      */
     public function __construct(
         DocumentManager $dm,
@@ -81,13 +84,15 @@ class Group
     public function createGroup()
     {
         $data = null;
-        $errors = [];
 
         $request = $this->requestStack->getCurrentRequest();
         /**
          * @var \Core\Documents\User
          */
         $user = $this->tokenStorage->getToken()->getUser();
+        if (!$user) {
+            throw new TokenNotFoundException();
+        }
 
         $name = trim($request->request->get('name'));
         $description = $request->request->get('description');
@@ -103,15 +108,11 @@ class Group
         $violations = $this->validator->validate($group);
 
         if ((!$this->dm->getRepository('Documents:Group')->isUnique('name', $name))) {
-            $errors['message'] = 'Not a unique value for field name';
-            $errors['field'] = 'name';
-            $errors['code'] = 701;
+            throw new Exception\ConstraintDefinitionException('Not a unique value for group name');
         }
 
         if (count($violations) > 0) {
             $data = $this->errorHandler->handle($violations);
-        } elseif (!empty($errors)) {
-            $data = $this->errorHandler->handle($errors);
         } else {
             $this->dm->flush();
             $data = $this->data->prepare($group, array('groups' => array('group1')));
@@ -122,25 +123,30 @@ class Group
 
     public function createGroupUser($id)
     {
+        $data = null;
+
         /**
          * @var \Core\Documents\User
          */
         $user = $this->tokenStorage->getToken()->getUser();
         if (!$user) {
-            throw new NotFoundHttpException('No user found');
+            throw new TokenNotFoundException();
         }
 
         $group = $this->dm->getRepository('Documents:Group')->findGropuById($id);
         if (!$group) {
-            throw new NotFoundHttpException('No group found');
+            throw new NotFoundHttpException('No group found for id ' . $id);
         }
 
         $group->addUser($user);
         $this->dm->persist($group);
-        $this->dm->flush();
 
-
-        $data = $this->data->prepare($group, array('groups' => array('group1')));
+        if (!empty($errors)) {
+            $data = $this->errorHandler->handle($errors);
+        } else {
+            $this->dm->flush();
+            $data = $this->data->prepare($group, array('groups' => array('group1')));
+        }
 
         return $data;
     }
@@ -152,7 +158,7 @@ class Group
          */
         $user = $this->tokenStorage->getToken()->getUser();
         if (!$user) {
-            throw new NotFoundHttpException('No user found');
+            throw new TokenNotFoundException();
         }
 
         $group = $this->dm->getRepository('Documents:Group')->findGropuById($id);
