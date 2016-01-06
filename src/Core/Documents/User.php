@@ -41,7 +41,6 @@ class User extends BaseUser
      * groups of the app where the user is admin
      *
      * @MongoDB\Field(type="collection")
-     * @Groups({"group1"})
      */
     protected $adminGroups = [];
 
@@ -82,6 +81,16 @@ class User extends BaseUser
     public function addAdminGroup($group)
     {
         $this->adminGroups[] = $group;
+    }
+
+    /**
+     * @param $group
+     */
+    public function removeAdminGroup($group)
+    {
+        if (($key = array_search($group, $this->adminGroups)) !== false) {
+            unset($this->adminGroups[$key]);
+        }
     }
 
 

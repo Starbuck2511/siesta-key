@@ -43,6 +43,12 @@ class Group
      */
     protected $users;
 
+    /**
+     * @MongoDB\Field(type="collection")
+     * @Groups({"group1"})
+     */
+    protected $schedules = [];
+
 
     public function __construct()
     {
@@ -112,7 +118,15 @@ class Group
     {
 
         $this->users[] = $user;
+    }
 
+    /**
+     * @param $user
+     */
+    public function removeUser($user)
+    {
+
+        $this->users->removeElement($user);
     }
 
     /**
@@ -122,6 +136,32 @@ class Group
     public function validate()
     {
 
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getSchedules()
+    {
+        return $this->schedules;
+    }
+
+    /**
+     * @param $schedule
+     */
+    public function addSchedule($schedule)
+    {
+        $this->schedules[] = $schedule;
+    }
+
+    /**
+     * @param $schedule
+     */
+    public function removeSchedule($schedule)
+    {
+        if (($key = array_search($schedule, $this->schedules)) !== false) {
+            unset($this->schedules[$key]);
+        }
     }
 
 }

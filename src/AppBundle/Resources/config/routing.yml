@@ -32,6 +32,11 @@ list_group:
     defaults:  { _controller: app.group_controller:listGroupAction }
     methods: [GET]
 
+delete_group:
+    path:      /groups/{id}
+    defaults:  { _controller: app.group_controller:deleteGroupAction }
+    methods: [DELETE]
+
 create_group_user:
     path:      /groups/{id}/users
     defaults:  { _controller: app.group_controller:createGroupUserAction }
@@ -41,4 +46,24 @@ delete_group_user:
     path:      /groups/{id}/users
     defaults:  { _controller: app.group_controller:deleteGroupUserAction }
     methods: [DELETE]
+
+list_group_users:
+    path:      /groups/{id}/users
+    defaults:  { _controller: app.group_controller:listGroupUsersAction }
+    methods: [GET]
+
+create_group_schedule:
+    path:      /groups/{id}/schedules
+    defaults:  { _controller: app.group_controller:createGroupScheduleAction }
+    methods: [POST]
+
+delete_group_schedule:
+    path:      /groups/{id}/schedules/{id2}
+    defaults:  { _controller: app.group_controller:deleteGroupScheduleAction }
+    methods: [DELETE]
+
+list_group_schedules:
+    path:      /groups/{id}/schedules
+    defaults:  { _controller: app.group_controller:listGroupSchedulesAction }
+    methods: [GET]
 

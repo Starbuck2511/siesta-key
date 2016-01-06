@@ -62,9 +62,38 @@ class GroupController
         $this->sendJsonResponse($data);
     }
 
+    public function listGroupUsersAction($id)
+    {
+        $data = null;
+
+        if ($this->cacheEnabled) {
+            $data = $this->cache->getItem('group:' . $id);
+        }
+
+        if (!$data) {
+            $data = $this->group->listGroupUsers($id);
+
+            if ($this->cacheEnabled) {
+                $this->cache->setItem('group:' . $id, $data);
+            }
+        }
+        $this->sendJsonResponse($data);
+    }
+
     public function createGroupAction()
     {
         $data = $this->group->createGroup();
+
+        if ($this->cacheEnabled) {
+            $this->cache->deleteItem('groups:all');
+        }
+
+        $this->sendJsonResponse($data);
+    }
+
+    public function deleteGroupAction($id)
+    {
+        $data = $this->group->deleteGroup($id);
 
         if ($this->cacheEnabled) {
             $this->cache->deleteItem('groups:all');
@@ -87,6 +116,17 @@ class GroupController
     public function deleteGroupUserAction($id)
     {
         $data = $this->group->deleteGroupUser($id);
+
+        if ($this->cacheEnabled) {
+            $this->cache->deleteItem('group:'. $id);
+        }
+
+        $this->sendJsonResponse($data);
+    }
+
+    public function createGroupScheduleAction($id)
+    {
+        $data = $this->group->createGroupSchedule($id);
 
         if ($this->cacheEnabled) {
             $this->cache->deleteItem('group:'. $id);

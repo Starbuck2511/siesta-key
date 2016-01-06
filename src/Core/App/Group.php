@@ -52,9 +52,6 @@ class Group
         $this->errorHandler = $errorHandler;
     }
 
-    /**
-     * @return array|\Core\Documents\Group[]
-     */
     public function listGroups()
     {
         $groups = $this->dm->getRepository('Documents:Group')->findAll();
@@ -73,10 +70,66 @@ class Group
         $group = $this->dm->getRepository('Documents:Group')->findGropuById($id);
 
         if (!$group) {
-            throw new NotFoundHttpException('No group found');
+            throw new NotFoundHttpException('No group found for id ' . $id);
         }
 
         $data = $this->data->prepare($group, array('groups' => array('group1')));
+
+        return $data;
+    }
+
+    public function deleteGroup($id)
+    {
+
+        /**
+         * @var \Core\Documents\User
+         */
+        $user = $this->tokenStorage->getToken()->getUser();
+        if (!$user) {
+            throw new TokenNotFoundException();
+        }
+
+        $group = $this->dm->getRepository('Documents:Group')->findGropuById($id);
+
+        if (!$group) {
+            throw new NotFoundHttpException('No group found for id ' . $id);
+        }
+
+        $adminGroups = $user->getAdminGroups();
+
+        if (!in_array($id, $adminGroups)) {
+            throw new Exception\ConstraintDefinitionException('No admin rights for this group');
+        } else {
+            $this->dm->remove($group);
+            $user->removeAdminGroup($id);
+            $this->dm->persist($user);
+            $this->dm->flush();
+            $data = $this->data->prepare(true);
+        }
+        return $data;
+    }
+
+
+    public function listGroupUsers($id)
+    {
+        $data = null;
+
+        /**
+         * @var \Core\Documents\User
+         */
+        $user = $this->tokenStorage->getToken()->getUser();
+        if (!$user) {
+            throw new TokenNotFoundException();
+        }
+
+        $group = $this->dm->getRepository('Documents:Group')->findGropuById($id);
+        if (!$group) {
+            throw new NotFoundHttpException('No group found for id ' . $id);
+        } else {
+            $users = $group->getUsers();
+        }
+
+        $data = $this->data->prepare($users, array('groups' => array('group1')));
 
         return $data;
     }
@@ -115,7 +168,7 @@ class Group
             $data = $this->errorHandler->handle($violations);
         } else {
             $this->dm->flush();
-            $data = $this->data->prepare($group, array('groups' => array('group1')));
+            $data = $this->data->prepare(true);
         }
 
         return $data;
@@ -138,14 +191,14 @@ class Group
             throw new NotFoundHttpException('No group found for id ' . $id);
         }
 
-        $group->addUser($user);
-        $this->dm->persist($group);
-
-        if (!empty($errors)) {
-            $data = $this->errorHandler->handle($errors);
-        } else {
+        $exists = $group->getUsers()->contains($user);
+        if (!$exists) {
+            $group->addUser($user);
+            $this->dm->persist($group);
             $this->dm->flush();
-            $data = $this->data->prepare($group, array('groups' => array('group1')));
+            $data = $this->data->prepare(true);
+        } else {
+            throw new Exception\ConstraintDefinitionException('User already exists in this group');
         }
 
         return $data;
@@ -153,6 +206,8 @@ class Group
 
     public function deleteGroupUser($id)
     {
+        $data = null;
+
         /**
          * @var \Core\Documents\User
          */
@@ -163,15 +218,48 @@ class Group
 
         $group = $this->dm->getRepository('Documents:Group')->findGropuById($id);
         if (!$group) {
-            throw new NotFoundHttpException('No group found');
+            throw new NotFoundHttpException('No group found for id ' . $id);
         }
 
-        // user is not in group yet, so add him now
-        $group->removeUser($user);
-        $this->dm->persist($group);
-        $this->dm->flush();
+        $exists = $group->getUsers()->contains($user);
+        if ($exists) {
+            $group->removeUser($user);
+            $this->dm->persist($group);
+            $this->dm->flush();
+            $data = $this->data->prepare(true);
+        } else {
+            throw new Exception\ConstraintDefinitionException('User not exists in this group');
+        }
 
-        $data = $this->data->prepare($group, array('groups' => array('group1')));
+        return $data;
+    }
+
+    public function createGroupSchedule($id)
+    {
+        $data = null;
+
+        /**
+         * @var \Core\Documents\User
+         */
+        $user = $this->tokenStorage->getToken()->getUser();
+        if (!$user) {
+            throw new TokenNotFoundException();
+        }
+
+        $group = $this->dm->getRepository('Documents:Group')->findGropuById($id);
+        if (!$group) {
+            throw new NotFoundHttpException('No group found for id ' . $id);
+        }
+
+        $exists = false;
+        if (!$exists) {
+            $group->addSchedule(['startDate' => '2016-01-08 17:30:00', 'range' => 'SINGLE']);
+            $this->dm->persist($group);
+            $this->dm->flush();
+            $data = $this->data->prepare(true);
+        } else {
+            throw new Exception\ConstraintDefinitionException('This schedule already exists in this group');
+        }
 
         return $data;
     }
