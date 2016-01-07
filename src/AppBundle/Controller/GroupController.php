@@ -135,6 +135,17 @@ class GroupController
         $this->sendJsonResponse($data);
     }
 
+    public function deleteGroupScheduleAction($id, $scheduleId)
+    {
+        $data = $this->group->deleteGroupSchedule($id, $scheduleId);
+
+        if ($this->cacheEnabled) {
+            $this->cache->deleteItem('group:'. $id);
+        }
+
+        $this->sendJsonResponse($data);
+    }
+
     public function createGroupAppointmentAcceptAction($id)
     {
         $data = $this->group->createGroupAppointmentAccept($id);
@@ -154,6 +165,24 @@ class GroupController
             $this->cache->deleteItem('group:'. $id);
         }
 
+        $this->sendJsonResponse($data);
+    }
+
+    public function listGroupSchedulesAction($id)
+    {
+        $data = null;
+
+        if ($this->cacheEnabled) {
+            $data = $this->cache->getItem('group:' . $id);
+        }
+
+        if (!$data) {
+            $data = $this->group->listGroupSchedules($id);
+
+            if ($this->cacheEnabled) {
+                $this->cache->setItem('group:' . $id, $data);
+            }
+        }
         $this->sendJsonResponse($data);
     }
 

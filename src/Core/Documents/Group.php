@@ -246,7 +246,7 @@ class Group
      */
     public function removeSchedule($schedule)
     {
-        if (($key = array_search($schedule, $this->schedules)) !== false) {
+        if (($key = array_search($schedule, array_column($this->schedules, 'id'))) !== false) {
             unset($this->schedules[$key]);
         }
     }

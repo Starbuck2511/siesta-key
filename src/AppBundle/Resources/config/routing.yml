@@ -58,7 +58,7 @@ create_group_schedule:
     methods: [POST]
 
 delete_group_schedule:
-    path:      /groups/{id}/schedules/{id2}
+    path:      /groups/{id}/schedules/{scheduleId}
     defaults:  { _controller: app.group_controller:deleteGroupScheduleAction }
     methods: [DELETE]
 
