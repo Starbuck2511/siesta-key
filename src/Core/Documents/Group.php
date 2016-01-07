@@ -55,9 +55,9 @@ class Group
      */
     protected $currentAppointment;
 
-   /**
-    * @MongoDB\Field(type="collection")
-    */
+    /**
+     * @MongoDB\Field(type="collection")
+     */
     protected $appointmentAccepts = [];
 
     /**
@@ -192,7 +192,7 @@ class Group
                             } else {
                                 // the weekday is not today, so get next date for next weekday
                                 $nextWeekday = date('Y-m-d', strtotime('next ' . $dayNames[$schedule['weekday']]));
-                                $dates[] = $nextWeekday . ' ' .$schedule['time'];
+                                $dates[] = $nextWeekday . ' ' . $schedule['time'];
                             }
                             continue;
                             break;
@@ -210,21 +210,19 @@ class Group
         }
 
         // sort dates in array, lowest first
-        usort($dates, function($a, $b) {
+        usort($dates, function ($a, $b) {
             return strtotime($a) - strtotime($b);
         });
 
         $currentAppointment = $dates[0];
 
-        if($this->currentAppointment != $currentAppointment) {
+        if ($this->currentAppointment != $currentAppointment) {
             // current appointment has changed
             $this->currentAppointment = $currentAppointment;
             // remove all old accepts and declines for new one
             $this->appointmentAccepts = [];
             $this->appointmentDeclines = [];
         }
-
-
     }
 
     /**
@@ -275,7 +273,10 @@ class Group
      */
     public function addAppointmentAccept($appointmentAccept)
     {
-        $this->appointmentAccepts[] = $appointmentAccept;
+        if (!in_array($appointmentAccept, $this->appointmentAccepts)) {
+            $this->appointmentAccepts[] = $appointmentAccept;
+        }
+
     }
 
     /**
@@ -301,7 +302,9 @@ class Group
      */
     public function addAppointmentDecline($appointmentDecline)
     {
-        $this->appointmentDeclines[] = $appointmentDecline;
+        if (!in_array($appointmentDecline, $this->appointmentDeclines)) {
+            $this->appointmentDeclines[] = $appointmentDecline;
+        }
     }
 
     /**

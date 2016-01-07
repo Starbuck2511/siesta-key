@@ -135,6 +135,28 @@ class GroupController
         $this->sendJsonResponse($data);
     }
 
+    public function createGroupAppointmentAcceptAction($id)
+    {
+        $data = $this->group->createGroupAppointmentAccept($id);
+
+        if ($this->cacheEnabled) {
+            $this->cache->deleteItem('group:'. $id);
+        }
+
+        $this->sendJsonResponse($data);
+    }
+
+    public function createGroupAppointmentDeclineAction($id)
+    {
+        $data = $this->group->createGroupAppointmentDecline($id);
+
+        if ($this->cacheEnabled) {
+            $this->cache->deleteItem('group:'. $id);
+        }
+
+        $this->sendJsonResponse($data);
+    }
+
     private function sendJsonResponse($data)
     {
         $response = new Response();

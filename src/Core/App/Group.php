@@ -277,4 +277,60 @@ class Group
 
         return $data;
     }
+
+    public function createGroupAppointmentAccept($id)
+    {
+        $data = null;
+
+        /**
+         * @var \Core\Documents\User
+         */
+        $user = $this->tokenStorage->getToken()->getUser();
+        if (!$user) {
+            throw new TokenNotFoundException();
+        }
+
+        $group = $this->dm->getRepository('Documents:Group')->findGropuById($id);
+        if (!$group) {
+            throw new NotFoundHttpException('No group found for id ' . $id);
+        }
+
+        $group->removeAppointmentDecline($user->getId());
+        $group->addAppointmentAccept($user->getId());
+        $this->dm->persist($group);
+        $this->dm->flush();
+        $data = $this->data->prepare(true);
+
+
+        return $data;
+    }
+
+    public function createGroupAppointmentDecline($id)
+    {
+        $data = null;
+
+        /**
+         * @var \Core\Documents\User
+         */
+        $user = $this->tokenStorage->getToken()->getUser();
+        if (!$user) {
+            throw new TokenNotFoundException();
+        }
+
+        $group = $this->dm->getRepository('Documents:Group')->findGropuById($id);
+        if (!$group) {
+            throw new NotFoundHttpException('No group found for id ' . $id);
+        }
+
+        $group->removeAppointmentAccept($user->getId());
+        $group->addAppointmentDecline($user->getId());
+        $this->dm->persist($group);
+        $this->dm->flush();
+        $data = $this->data->prepare(true);
+
+
+        return $data;
+    }
+
+
 }

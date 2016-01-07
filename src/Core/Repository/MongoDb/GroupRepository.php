@@ -29,9 +29,4 @@ class GroupRepository extends DocumentRepository
 
         return $result;
     }
-
-    public function findGroupScheduleById($id, $scheduleId) {
-
-    }
-
 }
