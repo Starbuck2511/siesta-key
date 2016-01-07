@@ -237,6 +237,7 @@ class Group
     public function createGroupSchedule($id)
     {
         $data = null;
+        $exists = false;
 
         /**
          * @var \Core\Documents\User
@@ -251,9 +252,22 @@ class Group
             throw new NotFoundHttpException('No group found for id ' . $id);
         }
 
-        $exists = false;
+        $date = '2016-01-03 10:00:00';
+        $scheduleId = md5($date);
+
+        // check if this schedule already exists
+        $schedules = $group->getSchedules();
+        foreach ($schedules as $schedule) {
+            if($schedule['id'] === $scheduleId) {
+                $exists = true;
+                break;
+            }
+        }
+
         if (!$exists) {
-            $group->addSchedule(['startDate' => '2016-01-08 17:30:00', 'range' => 'SINGLE']);
+            $weekday = date('w', strtotime($date));
+            $time = date('H:i:s', strtotime($date));
+            $group->addSchedule(['id' => $scheduleId, 'startDate' => $date, 'weekday' => $weekday, 'time' => $time, 'type' => 'WEEKLY']);
             $this->dm->persist($group);
             $this->dm->flush();
             $data = $this->data->prepare(true);
