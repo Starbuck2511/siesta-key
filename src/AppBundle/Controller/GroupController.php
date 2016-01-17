@@ -191,6 +191,7 @@ class GroupController
         $response = new Response();
         $response->setContent($data);
         $response->headers->set('Content-Type', 'application/json');
+        $response->headers->set('Access-Control-Allow-Origin', 'http://siesta-key-app.local');
         $response->send();
     }
 
