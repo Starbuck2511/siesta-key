@@ -1,3 +1,7 @@
+#<IfModule mod_headers.c>
+#Header set Access-Control-Allow-Origin "*"
+#</IfModule>
+
 # Use the front controller as index file. It serves as a fallback solution when
 # every other rewrite/redirect fails (e.g. in an aliased environment without
 # mod_rewrite). Additionally, this reduces the matching process for the
@@ -18,7 +22,8 @@ DirectoryIndex app.php
 </IfModule>
 
 <IfModule mod_rewrite.c>
-    RewriteEngine On
+    RewriteEngine On 
+
 
     # Determine the RewriteBase automatically and set it as environment variable.
     # If you are using Apache aliases to do mass virtual hosting or installed the

@@ -68,6 +68,17 @@ swiftmailer:
     password:  "%mailer_password%"
     spool:     { type: memory }
 
+# CORS
+nelmio_cors:
+    paths:
+        '^/':
+            allow_credentials: true
+            allow_origin: ['*']
+            allow_headers: ['*']
+            allow_methods: ['POST', 'PUT', 'GET', 'DELETE','OPTIONS']
+            max_age: 3600
+            origin_regex: false
+
 # Redis
 snc_redis:
     clients:

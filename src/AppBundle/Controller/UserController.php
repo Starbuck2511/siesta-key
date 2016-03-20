@@ -47,7 +47,7 @@ class UserController
                 $this->cache->setItem('groups:all', $data);
             }
         }
-        $this->sendJsonResponse($data);
+        return $this->prepareJsonResponse($data);
     }
 
     public function createUserAction()
@@ -56,14 +56,11 @@ class UserController
 
     }
 
-    private function sendJsonResponse($data)
+    private function prepareJsonResponse($data)
     {
         $response = new Response();
         $response->setContent($data);
         $response->headers->set('Content-Type', 'application/json');
-        $response->headers->set('Access-Control-Allow-Origin', 'http://siesta-key-app.local');
-        $response->send();
+        return $response;
     }
-
-
 }

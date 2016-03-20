@@ -5,6 +5,7 @@ namespace AppBundle\Controller;
 use Core\Cache\CacheProvider;
 use Core\App\Group;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
 
 
 class GroupController
@@ -41,7 +42,7 @@ class GroupController
                 $this->cache->setItem('groups:all', $data);
             }
         }
-        $this->sendJsonResponse($data);
+        return $this->prepareJsonResponse($data);
     }
 
     public function listGroupAction($id)
@@ -59,7 +60,7 @@ class GroupController
                 $this->cache->setItem('group:' . $id, $data);
             }
         }
-        $this->sendJsonResponse($data);
+        return $this->prepareJsonResponse($data);
     }
 
     public function listGroupUsersAction($id)
@@ -77,7 +78,7 @@ class GroupController
                 $this->cache->setItem('group:' . $id, $data);
             }
         }
-        $this->sendJsonResponse($data);
+        return $this->prepareJsonResponse($data);
     }
 
     public function createGroupAction()
@@ -88,7 +89,7 @@ class GroupController
             $this->cache->deleteItem('groups:all');
         }
 
-        $this->sendJsonResponse($data);
+        return $this->prepareJsonResponse($data);
     }
 
     public function deleteGroupAction($id)
@@ -99,7 +100,7 @@ class GroupController
             $this->cache->deleteItem('groups:all');
         }
 
-        $this->sendJsonResponse($data);
+        return $this->prepareJsonResponse($data);
     }
 
     public function createGroupUserAction($id)
@@ -110,7 +111,7 @@ class GroupController
             $this->cache->deleteItem('group:'. $id);
         }
 
-        $this->sendJsonResponse($data);
+        return $this->prepareJsonResponse($data);
     }
 
     public function deleteGroupUserAction($id)
@@ -121,7 +122,7 @@ class GroupController
             $this->cache->deleteItem('group:'. $id);
         }
 
-        $this->sendJsonResponse($data);
+        return $this->prepareJsonResponse($data);
     }
 
     public function createGroupScheduleAction($id)
@@ -132,7 +133,7 @@ class GroupController
             $this->cache->deleteItem('group:'. $id);
         }
 
-        $this->sendJsonResponse($data);
+        return $this->prepareJsonResponse($data);
     }
 
     public function deleteGroupScheduleAction($id, $scheduleId)
@@ -143,7 +144,7 @@ class GroupController
             $this->cache->deleteItem('group:'. $id);
         }
 
-        $this->sendJsonResponse($data);
+        return $this->prepareJsonResponse($data);
     }
 
     public function createGroupAppointmentAcceptAction($id)
@@ -154,7 +155,7 @@ class GroupController
             $this->cache->deleteItem('group:'. $id);
         }
 
-        $this->sendJsonResponse($data);
+        return $this->prepareJsonResponse($data);
     }
 
     public function createGroupAppointmentDeclineAction($id)
@@ -165,7 +166,7 @@ class GroupController
             $this->cache->deleteItem('group:'. $id);
         }
 
-        $this->sendJsonResponse($data);
+        return $this->prepareJsonResponse($data);
     }
 
     public function listGroupSchedulesAction($id)
@@ -183,16 +184,15 @@ class GroupController
                 $this->cache->setItem('group:' . $id, $data);
             }
         }
-        $this->sendJsonResponse($data);
+        return $this->prepareJsonResponse($data);
     }
 
-    private function sendJsonResponse($data)
+    private function prepareJsonResponse($data)
     {
         $response = new Response();
         $response->setContent($data);
         $response->headers->set('Content-Type', 'application/json');
-        $response->headers->set('Access-Control-Allow-Origin', 'http://siesta-key-app.local');
-        $response->send();
-    }
 
+        return $response;
+    }
 }

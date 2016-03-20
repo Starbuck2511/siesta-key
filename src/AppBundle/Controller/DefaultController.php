@@ -11,9 +11,9 @@ class DefaultController extends Controller
 
     public function indexAction(Request $request)
     {
-        $response = $this->forward('FOSUserBundle:Registration:register');
+        //$response = $this->forward('FOSUserBundle:Registration:register');
 
-        return $response;
+        //return $response;
         exit('default controller');
 
         // replace this example code with whatever you need
