@@ -207,14 +207,16 @@ class Group
                     $dates[] = $schedule['startDate'];
                 }
             }
+
+            // sort dates in array, lowest first
+            usort($dates, function ($a, $b) {
+                return strtotime($a) - strtotime($b);
+            });
+
+            $currentAppointment = $dates[0];
         }
 
-        // sort dates in array, lowest first
-        usort($dates, function ($a, $b) {
-            return strtotime($a) - strtotime($b);
-        });
 
-        $currentAppointment = $dates[0];
 
         if ($this->currentAppointment != $currentAppointment) {
             // current appointment has changed

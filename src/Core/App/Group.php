@@ -2,11 +2,13 @@
 namespace Core\App;
 
 use Core\Data\DataHandler;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Core\Documents\Group as GroupDocument;
 use Core\Data\DataHandler as ResponseData;
 use Core\Error\ErrorHandler;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
 use Symfony\Component\Security\Core\Exception\TokenNotFoundException;
@@ -138,7 +140,6 @@ class Group
     {
         $data = null;
 
-        $request = $this->requestStack->getCurrentRequest();
         /**
          * @var \Core\Documents\User
          */
@@ -147,8 +148,11 @@ class Group
             throw new TokenNotFoundException();
         }
 
-        $name = trim($request->request->get('name'));
-        $description = $request->request->get('description');
+        $param = $this->getRequestParamAsArray();
+
+        $name = trim($param->get('name'));
+        $description = $param->get('description');
+
 
         $group = new GroupDocument();
         $group->setName($name);
@@ -309,7 +313,8 @@ class Group
         return $data;
     }
 
-    public function createGroupAppointmentAccept($id) {
+    public function createGroupAppointmentAccept($id)
+    {
         $data = null;
 
         /**
@@ -335,7 +340,8 @@ class Group
         return $data;
     }
 
-    public function createGroupAppointmentDecline($id) {
+    public function createGroupAppointmentDecline($id)
+    {
         $data = null;
 
         /**
@@ -383,6 +389,16 @@ class Group
         $data = $this->data->prepare($schedules);
 
         return $data;
+    }
+
+    private function getRequestParamAsArray(){
+
+        $request = $this->requestStack->getCurrentRequest();
+        $content = $request->getContent();
+        $content = json_decode($content, true);
+
+        return new ArrayCollection($content);
+
     }
 
 

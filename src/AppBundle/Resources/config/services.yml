@@ -7,11 +7,11 @@ services:
     app.error_processor:
         class: Core\Error\ApiErrorProcessor
 
-    app.exception_listener:
-        class: AppBundle\EventListener\ExceptionListener
-        arguments: [@app.error_processor]
-        tags:
-            - { name: kernel.event_listener, event: kernel.exception, method: onKernelException, priority: 10}
+#    app.exception_listener:
+#        class: AppBundle\EventListener\ExceptionListener
+#        arguments: [@app.error_processor]
+#        tags:
+#            - { name: kernel.event_listener, event: kernel.exception, method: onKernelException, priority: 10}
 
     app.user:
         class: Core\App\User
