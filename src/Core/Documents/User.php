@@ -23,7 +23,7 @@ class User extends BaseUser
     /**
      * @MongoDB\Field(type="string")
      * @Assert\NotBlank()
-     * @todo Check if not already exists in db
+     * @fixme Check if not already exists in db
      */
     protected $apiKey;
 
