@@ -33,15 +33,21 @@ class TokenAuthenticator extends AbstractGuardAuthenticator
      */
     public function getCredentials(Request $request)
     {
-        if (!$token = $request->headers->get('X-AUTH-TOKEN')) {
-            // no token? Return null and no other methods will be called
-            return;
+        $token = $request->headers->get('X-AUTH-TOKEN');
+
+
+        if (!empty($token) && $token != 'NULL' && $token != 'null') {
+            // What you return here will be passed to getUser() as $credentials
+            return array(
+                'token' => $token,
+            );
+
         }
 
-        // What you return here will be passed to getUser() as $credentials
-        return array(
-            'token' => $token,
-        );
+        // no token? Return null and no other methods will be called
+        return null;
+
+
     }
 
     /**

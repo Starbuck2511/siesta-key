@@ -38,11 +38,15 @@ security:
             pattern: ^/
             form_login:
                 provider: fos_userbundle
-                csrf_token_generator: security.csrf.token_manager
+                #csrf_token_generator: security.csrf.token_manager
                 failure_handler: app.authentication_rest_handler
                 success_handler: app.authentication_rest_handler
-                #username_parameter: login
-                #password_parameter: password
+                username_parameter: username
+                password_parameter: password
+                remember_me:    false
+                # by default, a session must exist before submitting an authentication request
+                # if false, then Request::hasPreviousSession is not called during authentication
+                require_previous_session: false
 
             logout:       true
             anonymous:    true
@@ -50,10 +54,6 @@ security:
 
 
     access_control:
-        - { path: ^/rest/login$, role: IS_AUTHENTICATED_ANONYMOUSLY }
-        - { path: ^/rest/login_check$, role: IS_AUTHENTICATED_ANONYMOUSLY }
-        - { path: ^/rest/register$, role: IS_AUTHENTICATED_ANONYMOUSLY }
-        - { path: ^/rest/resetting$, role: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/login$, role: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/login_check$, role: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/register, role: IS_AUTHENTICATED_ANONYMOUSLY }
