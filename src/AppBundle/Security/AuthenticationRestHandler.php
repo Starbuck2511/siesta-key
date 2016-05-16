@@ -26,7 +26,17 @@ class AuthenticationRestHandler implements AuthenticationSuccessHandlerInterface
     {
 
         $apiKey = $token->getUser()->getApiKey();
+        $userId = $token->getUser()->getId();
+        $userName = $token->getUser()->getUsername();
+        $email = $token->getUser()->getEmail();
+
+
         $data['authToken'] = $apiKey;
+        $data['userid'] = $userId;
+        $data['username'] = $userName;
+        $data['email'] = $email;
+
+
         $data = json_encode($data, JSON_FORCE_OBJECT);
         $response = new Response(null, Response::HTTP_OK);
         $response->setContent($data);

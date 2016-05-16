@@ -6,9 +6,23 @@ use Doctrine\ODM\MongoDB\DocumentRepository;
 
 class GroupRepository extends DocumentRepository
 {
-    public function findGropuById($id)
+    public function findGroupById($id)
     {
         return $this->findOneBy(array('id' => $id));
+    }
+
+    public function findGroupsById($ids)
+    {
+
+
+        $qb = $this->createQueryBuilder()
+            ->select()
+            ->field('id')
+            ->in($ids);
+        $query = $qb->getQuery();
+        return $query->execute();
+
+
     }
 
     public function isUnique($field, $value)

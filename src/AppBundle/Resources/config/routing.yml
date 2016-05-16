@@ -23,6 +23,11 @@ list_groups:
     defaults:  { _controller: app.group_controller:listGroupsAction }
     methods: [GET]
 
+list_user_groups:
+    path:      /users/{id}/groups
+    defaults:  { _controller: app.user_controller:listUserGroupsAction }
+    methods: [GET]
+
 create_group:
     path:      /groups
     defaults:  { _controller: app.group_controller:createGroupAction }

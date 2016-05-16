@@ -30,6 +30,14 @@ class UserController
         exit('listUserAction');
     }
 
+    public function listUserGroupsAction($id)
+    {
+        $data = null;
+        $data = $this->user->listUserGroups($id);
+
+        return $this->prepareJsonResponse($data);
+    }
+
 
     public function listUsersAction()
     {
@@ -53,7 +61,6 @@ class UserController
     public function createUserAction()
     {
         // user is created by FOSUserBundle
-
     }
 
     private function prepareJsonResponse($data)

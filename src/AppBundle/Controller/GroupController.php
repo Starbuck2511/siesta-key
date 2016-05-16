@@ -45,6 +45,7 @@ class GroupController
         return $this->prepareJsonResponse($data);
     }
 
+
     public function listGroupAction($id)
     {
         $data = null;

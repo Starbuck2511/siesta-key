@@ -44,6 +44,13 @@ class User extends BaseUser
      */
     protected $adminGroups = [];
 
+    /**
+     * groups of the app where the user is a member
+     *
+     * @MongoDB\Field(type="collection")
+     */
+    protected $memberGroups = [];
+
 
     public function __construct()
     {
@@ -90,6 +97,33 @@ class User extends BaseUser
     {
         if (($key = array_search($group, $this->adminGroups)) !== false) {
             unset($this->adminGroups[$key]);
+        }
+    }
+
+
+    /**
+     * @return mixed
+     */
+    public function getMemberGroups()
+    {
+        return $this->memberGroups;
+    }
+
+    /**
+     * @param $group
+     */
+    public function addMemberGroup($group)
+    {
+        $this->memberGroups[] = $group;
+    }
+
+    /**
+     * @param $group
+     */
+    public function removeMemberGroup($group)
+    {
+        if (($key = array_search($group, $this->memberGroups)) !== false) {
+            unset($this->memberGroups[$key]);
         }
     }
 

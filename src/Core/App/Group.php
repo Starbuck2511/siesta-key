@@ -69,7 +69,7 @@ class Group
 
     public function listGroup($id)
     {
-        $group = $this->dm->getRepository('Documents:Group')->findGropuById($id);
+        $group = $this->dm->getRepository('Documents:Group')->findGroupById($id);
 
         if (!$group) {
             throw new NotFoundHttpException('No group found for id ' . $id);
@@ -79,6 +79,7 @@ class Group
 
         return $data;
     }
+
 
     public function deleteGroup($id)
     {
@@ -160,6 +161,7 @@ class Group
         $group->addUser($user);
         $this->dm->persist($group);
         $user->addAdminGroup($group->getId());
+        $user->addMemberGroup($group->getId());
         $this->dm->persist($user);
 
         $violations = $this->validator->validate($group);

@@ -46,13 +46,35 @@ class User
 
     }
 
-    public function createUser()
-    {
-        // user is created by FOSUserBundle
-    }
+    public function listUserGroups($id) {
 
-    public function listUser($id)
-    {
-        echo 'list user with $id = ' . $id;
+        $groups = [];
+
+        /**
+         * @var \Core\Documents\User
+         */
+        $user = $this->tokenStorage->getToken()->getUser();
+        if (!$user) {
+            throw new TokenNotFoundException();
+        }
+
+        // only show groups that belong to the currently authenticated user
+        if($id === $user->getId()) {
+            $groupIds = $user->getMemberGroups();
+
+            if(!empty($groupIds)){
+
+                $groups = $this->dm->getRepository('Documents:Group')->findGroupsById($groupIds);
+            }
+        }
+
+
+
+
+        $data = $this->data->prepare($groups, array('groups' => array('group1')));
+        return $data;
+
+
+
     }
 }

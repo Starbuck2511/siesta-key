@@ -16,7 +16,6 @@ services:
     app.authentication_rest_handler:
         class: AppBundle\Security\AuthenticationRestHandler
 
-
     app.user:
         class: Core\App\User
         arguments: [@doctrine.odm.mongodb.document_manager, @request_stack, @security.token_storage, @app.data_handler]
