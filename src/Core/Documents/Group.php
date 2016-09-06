@@ -163,9 +163,9 @@ class Group
         );
         $dates = [];
         $currentAppointment = null;
-        $time = Date('H:i:s');
+        $time = date('H:i:s');
         $now = new \DateTime();
-        $today = Date('w');
+        $today = date('w');
         $schedules = $this->getSchedules();
         if (!empty($schedules)) {
             foreach ($schedules as $schedule) {

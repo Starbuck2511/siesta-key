@@ -92,7 +92,7 @@ class Group
             throw new TokenNotFoundException();
         }
 
-        $group = $this->dm->getRepository('Documents:Group')->findGropuById($id);
+        $group = $this->dm->getRepository('Documents:Group')->findGroupById($id);
 
         if (!$group) {
             throw new NotFoundHttpException('No group found for id ' . $id);
@@ -125,7 +125,7 @@ class Group
             throw new TokenNotFoundException();
         }
 
-        $group = $this->dm->getRepository('Documents:Group')->findGropuById($id);
+        $group = $this->dm->getRepository('Documents:Group')->findGroupById($id);
         if (!$group) {
             throw new NotFoundHttpException('No group found for id ' . $id);
         } else {
@@ -192,7 +192,7 @@ class Group
             throw new TokenNotFoundException();
         }
 
-        $group = $this->dm->getRepository('Documents:Group')->findGropuById($id);
+        $group = $this->dm->getRepository('Documents:Group')->findGroupById($id);
         if (!$group) {
             throw new NotFoundHttpException('No group found for id ' . $id);
         }
@@ -222,7 +222,7 @@ class Group
             throw new TokenNotFoundException();
         }
 
-        $group = $this->dm->getRepository('Documents:Group')->findGropuById($id);
+        $group = $this->dm->getRepository('Documents:Group')->findGroupById($id);
         if (!$group) {
             throw new NotFoundHttpException('No group found for id ' . $id);
         }
@@ -253,12 +253,19 @@ class Group
             throw new TokenNotFoundException();
         }
 
-        $group = $this->dm->getRepository('Documents:Group')->findGropuById($id);
+        $group = $this->dm->getRepository('Documents:Group')->findGroupById($id);
         if (!$group) {
             throw new NotFoundHttpException('No group found for id ' . $id);
         }
 
-        $date = '2016-01-03 10:00:00';
+        $param = $this->getRequestParamAsArray();
+
+        $startDate = trim($param->get('startDate'));
+
+
+        //$date = '2016-01-03 10:00:00';
+        $startDate = new \DateTime($startDate);
+        $date = $startDate->format('Y-m-d H:i:s');
         $scheduleId = md5($date);
 
         // check if this schedule already exists
@@ -302,7 +309,7 @@ class Group
             throw new TokenNotFoundException();
         }
 
-        $group = $this->dm->getRepository('Documents:Group')->findGropuById($id);
+        $group = $this->dm->getRepository('Documents:Group')->findGroupById($id);
         if (!$group) {
             throw new NotFoundHttpException('No group found for id ' . $id);
         }
@@ -327,7 +334,7 @@ class Group
             throw new TokenNotFoundException();
         }
 
-        $group = $this->dm->getRepository('Documents:Group')->findGropuById($id);
+        $group = $this->dm->getRepository('Documents:Group')->findGroupById($id);
         if (!$group) {
             throw new NotFoundHttpException('No group found for id ' . $id);
         }
@@ -354,7 +361,7 @@ class Group
             throw new TokenNotFoundException();
         }
 
-        $group = $this->dm->getRepository('Documents:Group')->findGropuById($id);
+        $group = $this->dm->getRepository('Documents:Group')->findGroupById($id);
         if (!$group) {
             throw new NotFoundHttpException('No group found for id ' . $id);
         }
@@ -381,7 +388,7 @@ class Group
             throw new TokenNotFoundException();
         }
 
-        $group = $this->dm->getRepository('Documents:Group')->findGropuById($id);
+        $group = $this->dm->getRepository('Documents:Group')->findGroupById($id);
         if (!$group) {
             throw new NotFoundHttpException('No group found for id ' . $id);
         } else {
