@@ -148,9 +148,9 @@ class GroupController
         return $this->prepareJsonResponse($data);
     }
 
-    public function createGroupAppointmentAcceptAction($id)
+    public function createGroupScheduleAcceptAction($id, $scheduleId)
     {
-        $data = $this->group->createGroupAppointmentAccept($id);
+        $data = $this->group->createGroupScheduleAccept($id, $scheduleId);
 
         if ($this->cacheEnabled) {
             $this->cache->deleteItem('group:'. $id);
@@ -159,9 +159,9 @@ class GroupController
         return $this->prepareJsonResponse($data);
     }
 
-    public function createGroupAppointmentDeclineAction($id)
+    public function createGroupScheduleDeclineAction($id, $scheduleId)
     {
-        $data = $this->group->createGroupAppointmentDecline($id);
+        $data = $this->group->createGroupScheduleDecline($id, $scheduleId);
 
         if ($this->cacheEnabled) {
             $this->cache->deleteItem('group:'. $id);
@@ -180,6 +180,24 @@ class GroupController
 
         if (!$data) {
             $data = $this->group->listGroupSchedules($id);
+
+            if ($this->cacheEnabled) {
+                $this->cache->setItem('group:' . $id, $data);
+            }
+        }
+        return $this->prepareJsonResponse($data);
+    }
+
+    public function listGroupScheduleAction($id, $scheduleId)
+    {
+        $data = null;
+
+        if ($this->cacheEnabled) {
+            $data = $this->cache->getItem('group:' . $id);
+        }
+
+        if (!$data) {
+            $data = $this->group->listGroupSchedule($id, $scheduleId);
 
             if ($this->cacheEnabled) {
                 $this->cache->setItem('group:' . $id, $data);

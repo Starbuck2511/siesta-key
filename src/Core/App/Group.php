@@ -322,7 +322,7 @@ class Group
         return $data;
     }
 
-    public function createGroupAppointmentAccept($id)
+    public function createGroupScheduleAccept($id, $scheduleId)
     {
         $data = null;
 
@@ -339,8 +339,7 @@ class Group
             throw new NotFoundHttpException('No group found for id ' . $id);
         }
 
-        $group->removeAppointmentDecline($user->getId());
-        $group->addAppointmentAccept($user->getId());
+        $group->addScheduleAccept($user->getId(), $scheduleId);
         $this->dm->persist($group);
         $this->dm->flush();
         $data = $this->data->prepare(true);
@@ -349,7 +348,7 @@ class Group
         return $data;
     }
 
-    public function createGroupAppointmentDecline($id)
+    public function createGroupScheduleDecline($id, $scheduleId)
     {
         $data = null;
 
@@ -366,8 +365,7 @@ class Group
             throw new NotFoundHttpException('No group found for id ' . $id);
         }
 
-        $group->removeAppointmentAccept($user->getId());
-        $group->addAppointmentDecline($user->getId());
+        $group->addScheduleDecline($user->getId(), $scheduleId);
         $this->dm->persist($group);
         $this->dm->flush();
         $data = $this->data->prepare(true);
@@ -396,6 +394,30 @@ class Group
         }
 
         $data = $this->data->prepare($schedules);
+
+        return $data;
+    }
+
+    public function listGroupSchedule($id, $scheduleId)
+    {
+        $data = null;
+
+        /**
+         * @var \Core\Documents\User
+         */
+        $user = $this->tokenStorage->getToken()->getUser();
+        if (!$user) {
+            throw new TokenNotFoundException();
+        }
+
+        $group = $this->dm->getRepository('Documents:Group')->findGroupById($id);
+        if (!$group) {
+            throw new NotFoundHttpException('No group found for id ' . $id);
+        } else {
+            $schedule = $group->getSchedule($scheduleId);
+        }
+
+        $data = $this->data->prepare($schedule);
 
         return $data;
     }

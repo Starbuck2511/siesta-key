@@ -73,14 +73,19 @@ list_group_schedules:
     defaults:  { _controller: app.group_controller:listGroupSchedulesAction }
     methods: [GET]
 
-create_group_appointment_accept:
-    path:      /groups/{id}/appointment_accepts
-    defaults:  { _controller: app.group_controller:createGroupAppointmentAcceptAction }
+list_group_schedule:
+    path:      /groups/{id}/schedules/{scheduleId}
+    defaults:  { _controller: app.group_controller:listGroupScheduleAction }
+    methods: [GET]
+
+create_group_schedule_accept:
+    path:      /groups/{id}/schedules/{scheduleId}/accept
+    defaults:  { _controller: app.group_controller:createGroupScheduleAcceptAction }
     methods: [POST]
 
-create_group_appointment_decline:
-    path:      /groups/{id}/appointment_declines
-    defaults:  { _controller: app.group_controller:createGroupAppointmentDeclineAction }
+create_group_schedule_decline:
+    path:      /groups/{id}/schedules/{scheduleId}/decline
+    defaults:  { _controller: app.group_controller:createGroupScheduleDeclineAction }
     methods: [POST]
 
 

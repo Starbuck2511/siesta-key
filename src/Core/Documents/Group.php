@@ -53,21 +53,25 @@ class Group
      * @MongoDB\Field(type="string")
      * @Groups({"group1"})
      */
-    protected $currentAppointment;
+    protected $currentSchedule;
 
     /**
-     * @MongoDB\Field(type="collection")
+     * @MongoDB\Field(type="date")
      */
-    protected $appointmentAccepts = [];
+    protected $created;
 
     /**
-     * @MongoDB\Field(type="collection")
+     * @MongoDB\Field(type="date")
      */
-    protected $appointmentDeclines = [];
+    protected $modified;
 
 
     public function __construct()
     {
+        $this->setCreated(new \DateTime());
+        if ($this->getModified() == null) {
+            $this->setModified(new \DateTime());
+        }
         $this->users = new ArrayCollection();
     }
 
@@ -150,7 +154,7 @@ class Group
      * @MongoDB\PreUpdate
      * @todo we should add unit tests for this
      */
-    public function setCurrentAppointment()
+    public function setCurrentSchedule()
     {
         $dayNames = array(
             'sunday',
@@ -162,7 +166,7 @@ class Group
             'saturday',
         );
         $dates = [];
-        $currentAppointment = null;
+        $currentSchedule = null;
         $time = date('H:i:s');
         $now = new \DateTime();
         $today = date('w');
@@ -213,17 +217,13 @@ class Group
                 return strtotime($a) - strtotime($b);
             });
 
-            $currentAppointment = $dates[0];
+            $currentSchedule = $dates[0];
         }
 
 
-
-        if ($this->currentAppointment != $currentAppointment) {
-            // current appointment has changed
-            $this->currentAppointment = $currentAppointment;
-            // remove all old accepts and declines for new one
-            $this->appointmentAccepts = [];
-            $this->appointmentDeclines = [];
+        if ($this->currentSchedule != $currentSchedule) {
+            // current schedule has changed
+            $this->currentSchedule = $currentSchedule;
         }
     }
 
@@ -236,6 +236,21 @@ class Group
     }
 
     /**
+     * @param $scheduleId
+     * @return mixed $schedule
+     */
+    public function getSchedule($scheduleId)
+    {
+        $schedule = null;
+
+        if (($key = array_search($scheduleId, array_column($this->schedules, 'id'))) !== false) {
+            $schedule = $this->schedules[$key];
+        }
+
+        return $schedule;
+    }
+
+    /**
      * @param $schedule
      */
     public function addSchedule($schedule)
@@ -244,11 +259,11 @@ class Group
     }
 
     /**
-     * @param $schedule
+     * @param $scheduleId
      */
-    public function removeSchedule($schedule)
+    public function removeSchedule($scheduleId)
     {
-        if (($key = array_search($schedule, array_column($this->schedules, 'id'))) !== false) {
+        if (($key = array_search($scheduleId, array_column($this->schedules, 'id'))) !== false) {
             unset($this->schedules[$key]);
         }
     }
@@ -256,67 +271,110 @@ class Group
     /**
      * @return mixed
      */
-    public function getCurrentAppointment()
+    public function getCurrentSchedule()
     {
-        return $this->currentAppointment;
-    }
-
-
-    /**
-     * @return mixed
-     */
-    public function getAppointmentAccepts()
-    {
-        return $this->appointmentAccepts;
+        return $this->currentSchedule;
     }
 
     /**
-     * @param $appointmentAccept
+     * @param $userId
+     * @param $scheduleId
      */
-    public function addAppointmentAccept($appointmentAccept)
+    public function addScheduleAccept($userId, $scheduleId)
     {
-        if (!in_array($appointmentAccept, $this->appointmentAccepts)) {
-            $this->appointmentAccepts[] = $appointmentAccept;
-        }
-
-    }
-
-    /**
-     * @param $appointmentAccept
-     */
-    public function removeAppointmentAccept($appointmentAccept)
-    {
-        if (($key = array_search($appointmentAccept, $this->appointmentAccepts)) !== false) {
-            unset($this->appointmentAccepts[$key]);
+        // delete old entries first
+        $this->removeScheduleDecline($userId, $scheduleId);
+        $this->removeScheduleAccept($userId, $scheduleId);
+        // add entry
+        if (($key = array_search($scheduleId, array_column($this->schedules, 'id'))) !== false) {
+            $this->schedules[$key]['accepts'][$userId] = $userId;
         }
     }
 
     /**
-     * @return mixed
+     * @param $userId
+     * @param  $scheduleId
      */
-    public function getAppointmentDeclines()
+    public function removeScheduleAccept($userId, $scheduleId)
     {
-        return $this->appointmentDeclines;
-    }
+        if (($key = array_search($scheduleId, array_column($this->schedules, 'id'))) !== false) {
+            if(!empty($this->schedules[$key]['accepts'][$userId])){
+                unset($this->schedules[$key]['accepts'][$userId]);
+            }
 
-    /**
-     * @param $appointmentDecline
-     */
-    public function addAppointmentDecline($appointmentDecline)
-    {
-        if (!in_array($appointmentDecline, $this->appointmentDeclines)) {
-            $this->appointmentDeclines[] = $appointmentDecline;
         }
     }
 
     /**
-     * @param $appointmentDecline
+     * @param $userId
+     * @param  $scheduleId
      */
-    public function removeAppointmentDecline($appointmentDecline)
+    public function addScheduleDecline($userId, $scheduleId)
     {
-        if (($key = array_search($appointmentDecline, $this->appointmentDeclines)) !== false) {
-            unset($this->appointmentDeclines[$key]);
+        // delete old entries first
+        $this->removeScheduleDecline($userId, $scheduleId);
+        $this->removeScheduleAccept($userId, $scheduleId);
+        // add entry
+        if (($key = array_search($scheduleId, array_column($this->schedules, 'id'))) !== false) {
+            $this->schedules[$key]['declines'][$userId] = $userId;
         }
+    }
+
+    /**
+     * @param $userId
+     * @param  $scheduleId
+     */
+    public function removeScheduleDecline($userId, $scheduleId)
+    {
+        if (($key = array_search($scheduleId, array_column($this->schedules, 'id'))) !== false) {
+            if(!empty($this->schedules[$key]['declines'][$userId])){
+                unset($this->schedules[$key]['declines'][$userId]);
+            }
+
+        }
+    }
+
+    /**
+     * @return \DateTime $date
+     */
+    public function getCreated()
+    {
+        return $this->created;
+    }
+
+    /**
+     * @param \DateTime $date
+     */
+    public function setCreated(\DateTime $date)
+    {
+        $this->created = $date;
+    }
+
+    /**
+     * @return \DateTime $date
+     */
+    public function getModified()
+    {
+        return $this->modified;
+    }
+
+    /**
+     * @param \DateTime $date
+     */
+    public function setModified(\DateTime $date)
+    {
+        $this->modified = $date;
+    }
+
+
+    /**
+     * @MongoDB\PrePersist
+     * @MongoDB\PreUpdate
+     */
+    public function updateModifiedDatetime()
+    {
+        // update the modified time
+        $this->setModified(new \DateTime());
     }
 
 }
