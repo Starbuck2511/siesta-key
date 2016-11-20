@@ -150,11 +150,9 @@ class Group
     }
 
     /**
-     * @MongoDB\PrePersist
-     * @MongoDB\PreUpdate
      * @todo we should add unit tests for this
      */
-    public function setCurrentSchedule()
+    private function setCurrentSchedule()
     {
         $dayNames = array(
             'sunday',
@@ -225,6 +223,7 @@ class Group
             // current schedule has changed
             $this->currentSchedule = $currentSchedule;
         }
+
     }
 
     /**
@@ -301,11 +300,8 @@ class Group
     {
         if (($key = array_search($scheduleId, array_column($this->schedules, 'id'))) !== false) {
             if(!empty($this->schedules[$key]['accepts'])){
-                foreach ($this->schedules[$key]['accepts'] as $k => $v) {
-                    if($v === $userId){
-                        unset($this->schedules[$key]['accepts'][$k]);
-                    }
-                }
+                $arr = array_diff($this->schedules[$key]['accepts'], array($userId));
+                $this->schedules[$key]['accepts'] = array_values($arr);
             }
         }
     }
@@ -333,11 +329,8 @@ class Group
     {
         if (($key = array_search($scheduleId, array_column($this->schedules, 'id'))) !== false) {
             if(!empty($this->schedules[$key]['declines'])){
-                foreach ($this->schedules[$key]['declines'] as $k => $v) {
-                    if($v === $userId){
-                        unset($this->schedules[$key]['declines'][$k]);
-                    }
-                }
+                $arr = array_diff($this->schedules[$key]['declines'], array($userId));
+                $this->schedules[$key]['declines'] = array_values($arr);
             }
 
         }
@@ -380,7 +373,17 @@ class Group
      * @MongoDB\PrePersist
      * @MongoDB\PreUpdate
      */
-    public function updateModifiedDatetime()
+    public function handlePreActions()
+    {
+        $this->setCurrentSchedule();
+        $this->updateModifiedDatetime();
+    }
+
+
+    /**
+     * set modified date
+     */
+    private function updateModifiedDatetime()
     {
         // update the modified time
         $this->setModified(new \DateTime());
