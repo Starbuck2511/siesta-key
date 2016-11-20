@@ -255,6 +255,8 @@ class Group
      */
     public function addSchedule($schedule)
     {
+        $schedule['accepts'] = [];
+        $schedule['declines'] = [];
         $this->schedules[] = $schedule;
     }
 
@@ -287,7 +289,7 @@ class Group
         $this->removeScheduleAccept($userId, $scheduleId);
         // add entry
         if (($key = array_search($scheduleId, array_column($this->schedules, 'id'))) !== false) {
-            $this->schedules[$key]['accepts'][$userId] = $userId;
+            $this->schedules[$key]['accepts'][] = $userId;
         }
     }
 
@@ -298,10 +300,13 @@ class Group
     public function removeScheduleAccept($userId, $scheduleId)
     {
         if (($key = array_search($scheduleId, array_column($this->schedules, 'id'))) !== false) {
-            if(!empty($this->schedules[$key]['accepts'][$userId])){
-                unset($this->schedules[$key]['accepts'][$userId]);
+            if(!empty($this->schedules[$key]['accepts'])){
+                foreach ($this->schedules[$key]['accepts'] as $k => $v) {
+                    if($v === $userId){
+                        unset($this->schedules[$key]['accepts'][$k]);
+                    }
+                }
             }
-
         }
     }
 
@@ -316,7 +321,7 @@ class Group
         $this->removeScheduleAccept($userId, $scheduleId);
         // add entry
         if (($key = array_search($scheduleId, array_column($this->schedules, 'id'))) !== false) {
-            $this->schedules[$key]['declines'][$userId] = $userId;
+            $this->schedules[$key]['declines'][] = $userId;
         }
     }
 
@@ -327,8 +332,12 @@ class Group
     public function removeScheduleDecline($userId, $scheduleId)
     {
         if (($key = array_search($scheduleId, array_column($this->schedules, 'id'))) !== false) {
-            if(!empty($this->schedules[$key]['declines'][$userId])){
-                unset($this->schedules[$key]['declines'][$userId]);
+            if(!empty($this->schedules[$key]['declines'])){
+                foreach ($this->schedules[$key]['declines'] as $k => $v) {
+                    if($v === $userId){
+                        unset($this->schedules[$key]['declines'][$k]);
+                    }
+                }
             }
 
         }
