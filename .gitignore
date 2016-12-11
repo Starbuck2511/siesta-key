@@ -87,3 +87,6 @@ fabric.properties
 
 # Composer PHAR
 /composer.phar
+
+# Apache conf
+siesta-key.apache.conf
